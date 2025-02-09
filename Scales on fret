@@ -1,0 +1,120 @@
+from tkinter import *
+from tkinter import messagebox
+
+notes = ['C','C#','D','D#','E','F','F#','G','G#','A','A#','B','C','C#','D','D#','E','F','F#','G','G#','A','A#','B']
+
+#Tuning
+num = input('Enter the number of strings: ')
+n = int(num)
+
+tuning = list(range(0,n))
+
+tuning_type = input('Is tuning standard, drop or custom? ')
+tuning[n-1] = input('What is the lowest string? ')
+
+def pos(x) -> int:
+    return notes.index(x)
+
+def four_step(x) -> str:
+    return notes[pos(x)+4]
+
+def five_step(x) -> str:
+    return notes[pos(x)+5]
+
+def seven_step(x) -> str:
+    return notes[pos(x)+7]
+
+if tuning_type == 'standard':
+    for i in range(1,n-2): 
+        tuning[n-1-i] = five_step(tuning[n-i])
+
+    tuning[1] = four_step(tuning[2])
+    tuning[0] = five_step(tuning[1])
+    print(tuning)
+
+elif tuning_type == 'drop':
+    tuning[n-2] = seven_step(tuning[n-1])
+    for i in range(2,n-2): 
+        tuning[n-1-i] = five_step(tuning[n-i])
+    tuning[1] = four_step(tuning[2])
+    tuning[0] = five_step(tuning[1])
+    print(tuning)
+
+else :
+    for i in range(0,n-1):
+        tuning[i] = input ('Enter the strings from high to low: ' )
+    print(tuning)
+
+
+strings_mat = list(range(0,n))
+
+def start_from(x) -> list: # gives chromatic scale for one octave
+    return notes[notes.index(x):] + notes[1:notes.index(x)+1] 
+
+for i in range(0,len(tuning)):
+    strings_mat[i] = start_from(tuning[i])
+
+print(strings_mat)
+
+# Scale formulas
+root = input("Enter the root: ")
+
+def major(a) -> list:
+    return [a[0],a[2],a[4],a[5],a[7],a[9],a[11],a[12]]
+
+def minor(a) -> list:
+    return [a[0],a[2],a[3],a[5],a[7],a[8],a[10],a[12]]
+
+def phydom(a) -> list:
+    return [a[0],a[1],a[4],a[5],a[7],a[8],a[10],a[12]]
+    
+notes2 = start_from(root)
+
+scale = input("Enter the scale: ")
+if scale == 'major':
+    print(root,'major scale is', major(notes2))
+elif scale == 'minor':
+    print(root, 'minor scale is:', minor(notes2))
+elif scale == 'phrygian dominant':
+    print(root,'phyrgian dominant scale is:',phydom(notes2))
+
+
+#Picture
+top = Tk()
+C = Canvas(top, bg="white",width=1980,height=700)
+
+fret_up = 50
+fret_width = 100
+string_left = 100
+string_width = 80
+
+fret_down = fret_up + (n-1)*string_width
+
+string_right = string_left + 12*fret_width
+
+print('fret down is ' + str(fret_down))
+print('string right is ' + str(string_right))
+
+for i in range(string_left, string_right+1, fret_width): #frets (vertical ones)
+    fret = C.create_line(i,fret_up,i,fret_down,fill='black')    
+
+for j in range(fret_up, fret_down+1, string_width): #strings (horizontal ones)
+    string = C.create_line(string_left,j,string_right,j,fill='black')
+
+for i in range(0,len(tuning)):
+    C.create_text((string_left)/2,fret_up+i*string_width, text = tuning[i], font = ("Arial", 20), fill='red')
+
+radius = 20
+
+def disk(a,b,c): #(a,b) is center, c is radius
+    return C.create_oval(a-c,b-c, a+c,b+c,fill='red')
+
+for i in range(0,12):
+    for j in range(0,n):
+        x_center = 3*(string_left/2) + i*fret_width 
+        y_center = fret_up + j*string_width
+        disk(x_center,y_center,radius)
+
+C.pack()
+top.mainloop() 
+
