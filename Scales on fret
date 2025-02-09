@@ -92,8 +92,6 @@ fret_down = fret_up + (n-1)*string_width
 
 string_right = string_left + 12*fret_width
 
-print('fret down is ' + str(fret_down))
-print('string right is ' + str(string_right))
 
 for i in range(string_left, string_right+1, fret_width): #frets (vertical ones)
     fret = C.create_line(i,fret_up,i,fret_down,fill='black')    
